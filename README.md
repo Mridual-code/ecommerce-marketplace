@@ -251,43 +251,43 @@ npm run dev
 
 ## Home Page
 
-(Add Screenshot)
+![Home Page](screenshots/home.png)
 
 ---
 
 ## Products Page
 
-(Add Screenshot)
+![Products Page](screenshots/product.png)
 
 ---
 
 ## Login Page
 
-(Add Screenshot)
+![Login Page](screenshots/login.png)
 
 ---
 
 ## Register Page
 
-(Add Screenshot)
+![Register Page](screenshots/register.png)
 
 ---
 
 ## Customer Dashboard
 
-(Add Screenshot)
+![Customer Dashboard](screenshots/customer.png)
 
 ---
 
 ## Manager Dashboard
 
-(Add Screenshot)
+![Manager Dashboard](screenshots/manager.png)
 
 ---
 
 ## Admin Dashboard
 
-(Add Screenshot)
+![Admin Dashboard](screenshots/admin.png)
 
 ---
 
