@@ -20,6 +20,14 @@ app.get("/", (req, res) => {
   res.send("AutoCart API is running");
 });
 
+console.log("authRoutes:", typeof authRoutes);
+console.log("userRoutes:", typeof userRoutes);
+console.log("categoryRoutes:", typeof categoryRoutes);
+console.log("productRoutes:", typeof productRoutes);
+console.log("cartRoutes:", typeof cartRoutes);
+console.log("orderRoutes:", typeof orderRoutes);
+console.log("dashboardRoutes:", typeof dashboardRoutes);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
