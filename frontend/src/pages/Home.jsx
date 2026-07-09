@@ -3,10 +3,26 @@ import { Link } from "react-router-dom";
 
 function Home() {
   const cars = [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSdtgeeDHo5z4GdaeysK3SwpyUEbGMoS7qoutB9Jky3w&s=10",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9vUIMkQjM0PuuAKXvp579LTlkFMNthwW7u5CsQYtvFA&s=10",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQvTTYvz1v9eIEav46VlrWURzjNRt7B8vRu8hYD35SBw&s=10",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLRF0z04vE8ojy-vOw19FUlj_AMCtlP0ts_iUHDbt9kw&s=10",
+     {
+    image: "/hero/BMW.jpeg",
+    position: "center",
+  },
+  {
+    image: "/hero/gtr.jpeg",
+    position: "center top",
+  },
+  {
+    image: "/hero/mazda.jpeg",
+    position: "center",
+  },
+  {
+    image: "/hero/SUPRA.jpeg",
+    position: "center",
+  },
+  {
+    image: "/hero/viper.jpeg",
+    position: "center",
+  },
   ];
 
   const [currentCar, setCurrentCar] = useState(0);
@@ -22,11 +38,11 @@ function Home() {
   return (
     <section
       className="hero"
-      style={{
-        background: `linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.75)), url(${cars[currentCar]})`,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
+  style={{
+    background: `linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.75)), url(${cars[currentCar].image})`,
+    backgroundSize: "cover",
+    backgroundPosition: cars[currentCar].position,
+    backgroundRepeat: "no-repeat",
       }}
     >
       <div className="hero-content">
