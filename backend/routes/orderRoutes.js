@@ -1,11 +1,12 @@
 const express = require("express");
 
 const {
-  createCategory,
-  getCategories,
-  updateCategory,
-  deleteCategory
-} = require("../controllers/categoryController");
+  placeOrder,
+  getMyOrders,
+  getOrderById,
+  getAllOrders,
+  updateOrderStatus
+} = require("../controllers/orderController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
@@ -15,24 +16,35 @@ const router = express.Router();
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("Admin", "Manager"),
-  createCategory
+  roleMiddleware("Customer"),
+  placeOrder
 );
 
-router.get("/", getCategories);
+router.get(
+  "/my-orders",
+  authMiddleware,
+  roleMiddleware("Customer"),
+  getMyOrders
+);
+
+router.get(
+  "/all",
+  authMiddleware,
+  roleMiddleware("Admin", "Manager"),
+  getAllOrders
+);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  getOrderById
+);
 
 router.put(
-  "/:id",
+  "/:id/status",
   authMiddleware,
   roleMiddleware("Admin", "Manager"),
-  updateCategory
-);
-
-router.delete(
-  "/:id",
-  authMiddleware,
-  roleMiddleware("Admin", "Manager"),
-  deleteCategory
+  updateOrderStatus
 );
 
 module.exports = router;

@@ -4,25 +4,22 @@ const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      trim: true
+      required: true
     },
 
-    description: {
+    brand: {
       type: String,
       required: true
     },
 
-    price: {
-      type: Number,
-      required: true,
-      min: 0
+    model: {
+      type: String
     },
 
-    stock: {
-      type: Number,
-      required: true,
-      min: 0
+    type: {
+      type: String,
+      enum: ["Real Car", "Mini Toy"],
+      required: true
     },
 
     category: {
@@ -31,9 +28,52 @@ const productSchema = new mongoose.Schema(
       required: true
     },
 
-    image: {
+    price: {
+      type: Number,
+      required: true
+    },
+
+    stock: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+
+    description: {
       type: String,
-      default: ""
+      required: true
+    },
+
+    image: {
+      type: String
+    },
+
+    color: {
+      type: String
+    },
+
+    year: {
+      type: Number
+    },
+
+    fuelType: {
+      type: String
+    },
+
+    transmission: {
+      type: String
+    },
+
+    scale: {
+      type: String
+    },
+
+    material: {
+      type: String
+    },
+
+    ageGroup: {
+      type: String
     }
   },
   {
