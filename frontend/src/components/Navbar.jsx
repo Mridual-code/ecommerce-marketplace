@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
 
-function Navbar() {
-  const user = JSON.parse(localStorage.getItem("autocart_user"));
-
+function Navbar({ user, setUser }) {
   const logout = () => {
     localStorage.removeItem("autocart_token");
-    localStorage.removeItem("autocart_user");
+    setUser(null);
     window.location.href = "/";
   };
 
@@ -19,14 +17,32 @@ function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/products">Products</Link>
 
-        {user?.role === "Admin" && <Link to="/admin">Admin</Link>}
-        {user?.role === "Manager" && <Link to="/manager">Manager</Link>}
-        {user?.role === "Customer" && <Link to="/customer">Dashboard</Link>}
+        {user?.role === "Customer" && (
+          <>
+            <Link to="/cart">Cart</Link>
+            <Link to="/orders">My Orders</Link>
+            <Link to="/profile">Profile</Link>
+            <Link to="/customer">Dashboard</Link>
+          </>
+        )}
+
+        {user?.role === "Admin" && (
+          <Link to="/admin">Dashboard</Link>
+        )}
+
+        {user?.role === "Manager" && (
+          <Link to="/manager">Dashboard</Link>
+        )}
 
         {!user ? (
           <>
-            <Link to="/login" className="login-btn">Login</Link>
-            <Link to="/register" className="register-btn">Register</Link>
+            <Link to="/login" className="login-btn">
+              Login
+            </Link>
+
+            <Link to="/register" className="register-btn">
+              Register
+            </Link>
           </>
         ) : (
           <button onClick={logout} className="logout-btn">

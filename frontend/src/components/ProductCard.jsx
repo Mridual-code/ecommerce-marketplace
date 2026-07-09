@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 function ProductCard({ product }) {
+  const navigate = useNavigate();
+
   return (
     <div className="product-card">
       <div className="product-img">
@@ -10,11 +14,38 @@ function ProductCard({ product }) {
       </div>
 
       <div className="product-info">
-        <p className="product-type">{product.type}</p>
+        <div className="product-top">
+          <p className="product-type">{product.type}</p>
+          <p className={product.stock > 0 ? "stock-badge" : "stock-badge out"}>
+            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+          </p>
+        </div>
+
         <h3>{product.name}</h3>
-        <p>{product.brand}</p>
-        <h4>₹{product.price}</h4>
-        <button>View Details</button>
+
+        <p className="product-brand">
+          {product.brand}
+          {product.model && ` • ${product.model}`}
+        </p>
+
+        {product.category?.name && (
+          <p className="product-category">{product.category.name}</p>
+        )}
+
+        <h4>₹{Number(product.price).toLocaleString("en-IN")}</h4>
+
+        <div className="product-meta">
+          {product.year && <span>{product.year}</span>}
+          {product.fuelType && <span>{product.fuelType}</span>}
+          {product.transmission && <span>{product.transmission}</span>}
+          {product.scale && <span>{product.scale}</span>}
+        </div>
+
+        <button
+          onClick={() => navigate(`/products/${product._id}`)}
+        >
+          View Details
+        </button>
       </div>
     </div>
   );
