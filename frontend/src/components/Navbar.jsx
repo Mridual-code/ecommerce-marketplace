@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar({ user, setUser }) {
+  const navigate = useNavigate();
+
   const logout = () => {
     localStorage.removeItem("autocart_token");
     setUser(null);
-    window.location.href = "/";
+    navigate("/");
   };
 
   return (
@@ -15,7 +17,10 @@ function Navbar({ user, setUser }) {
 
       <div className="nav-links">
         <Link to="/">Home</Link>
-        <Link to="/products">Products</Link>
+        <Link to="/cars">Cars</Link>
+<Link to="/merchandise">Merchandise</Link>
+<Link to="/modifications">Modifications</Link>
+<Link to="/products">All Products</Link>
 
         {user?.role === "Customer" && (
           <>
@@ -36,16 +41,25 @@ function Navbar({ user, setUser }) {
 
         {!user ? (
           <>
-            <Link to="/login" className="login-btn">
+            <Link
+              to="/login"
+              className="login-btn"
+            >
               Login
             </Link>
 
-            <Link to="/register" className="register-btn">
+            <Link
+              to="/register"
+              className="register-btn"
+            >
               Register
             </Link>
           </>
         ) : (
-          <button onClick={logout} className="logout-btn">
+          <button
+            onClick={logout}
+            className="logout-btn"
+          >
             Logout
           </button>
         )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
+import { toast } from "react-toastify";
 
 function Login({ setUser }) {
   const navigate = useNavigate();
@@ -11,24 +11,39 @@ function Login({ setUser }) {
     password: ""
   });
 
-  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
   };
 
   const loginUser = async (e) => {
     e.preventDefault();
 
+    if (!form.email.trim() || !form.password.trim()) {
+      toast.error("Please enter your email and password");
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
+
       const res = await API.post("/auth/login", form);
 
-      localStorage.setItem("autocart_token", res.data.token);
+      localStorage.setItem(
+        "autocart_token",
+        res.data.token
+      );
 
       const profileRes = await API.get("/auth/profile");
       const user = profileRes.data.user;
 
       setUser(user);
+
+      toast.success(`Welcome, ${user.name}`);
 
       if (user.role === "Admin") {
         navigate("/admin");
@@ -38,19 +53,23 @@ function Login({ setUser }) {
         navigate("/customer");
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || "Login failed");
+      localStorage.removeItem("autocart_token");
+
+      toast.error(
+        error.response?.data?.message ||
+          "Login failed"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="auth-page">
       <div className="auth-box">
-
-        <BackButton />
         <h1>Login</h1>
-        <p>Welcome back to AutoCart</p>
 
-        {message && <div className="auth-message">{message}</div>}
+        <p>Welcome back to AutoCart</p>
 
         <form onSubmit={loginUser}>
           <input
@@ -59,6 +78,7 @@ function Login({ setUser }) {
             placeholder="Enter email"
             value={form.email}
             onChange={handleChange}
+            required
           />
 
           <input
@@ -67,13 +87,20 @@ function Login({ setUser }) {
             placeholder="Enter password"
             value={form.password}
             onChange={handleChange}
+            required
           />
 
-          <button type="submit">Login</button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Logging in..." : "Login"}
+          </button>
         </form>
 
         <p className="auth-link">
-          Don't have an account? <Link to="/register">Register</Link>
+          Don't have an account?{" "}
+          <Link to="/register">Register</Link>
         </p>
       </div>
     </div>

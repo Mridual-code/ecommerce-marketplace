@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
 
-function AdminDashboard() {
+function AdminDashboard( {user}) {
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalProducts: 0,
@@ -34,9 +33,7 @@ function AdminDashboard() {
 
   return (
     <div className="admin-page">
-      <BackButton />
-      <h1>Admin Dashboard</h1>
-
+<h1>Welcome, {user?.name} 👋</h1>
       <div className="dashboard-grid">
         <div className="dashboard-card">
           <h2>{stats.totalUsers}</h2>
@@ -61,6 +58,9 @@ function AdminDashboard() {
 
       <div className="admin-actions">
         <Link to="/admin/users">Manage Users</Link>
+        <Link to="/admin/departments">
+  Manage Departments
+</Link>
         <Link to="/admin/categories">Manage Categories</Link>
         <Link to="/admin/products">Manage Products</Link>
         <Link to="/admin/orders">Manage Orders</Link>

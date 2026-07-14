@@ -1,0 +1,93 @@
+.checkout-page {
+  min-height: 100vh;
+  background: #0b0b0f;
+  color: #fff;
+  padding: 120px 8% 60px;
+}
+
+.checkout-page h1 {
+  font-size: 42px;
+  margin-bottom: 35px;
+  color: #fff;
+}
+
+.checkout-form {
+  max-width: 700px;
+  margin: auto;
+  background: #15151d;
+  border: 1px solid #262632;
+  border-radius: 18px;
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.checkout-form input,
+.checkout-form textarea {
+  width: 100%;
+  background: #0f1016;
+  color: white;
+  border: 1px solid #2f3142;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.checkout-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus {
+  border-color: #ff1c1c;
+  box-shadow: 0 0 8px rgba(255, 28, 28, 0.35);
+}
+
+.checkout-form button {
+  margin-top: 15px;
+  background: #ff1c1c;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 17px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.checkout-form button:hover {
+  background: #d40000;
+  transform: translateY(-2px);
+}
+
+.status-text {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.error-text {
+  color: #ff6b6b;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .checkout-page {
+    padding: 100px 20px 40px;
+  }
+
+  .checkout-page h1 {
+    font-size: 32px;
+    text-align: center;
+  }
+
+  .checkout-form {
+    padding: 25px;
+  }
+}

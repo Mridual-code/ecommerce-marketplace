@@ -1,49 +1,112 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
 import ProductCard from "../components/ProductCard";
-import { Link } from "react-router-dom";
-import BackButton from "../components/BackButton";
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
+  const [department, setDepartment] = useState("");
+  const [category, setCategory] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const getProducts = async () => {
+  const fetchDepartments = async () => {
+    try {
+      const res = await API.get("/departments");
+      setDepartments(res.data.departments || []);
+    } catch (error) {
+      console.log("Department error:", error);
+    }
+  };
+
+  const fetchCategories = async (departmentId) => {
+    if (!departmentId) {
+      setCategories([]);
+      return;
+    }
+
+    try {
+      const res = await API.get(
+        `/categories?department=${departmentId}`
+      );
+
+      setCategories(res.data.categories || []);
+    } catch (error) {
+      console.log("Category error:", error);
+    }
+  };
+
+  const getProducts = async (customFilters = {}) => {
     try {
       setLoading(true);
-
-      let url = "/products";
-
-      const params = [];
-
-      if (search) {
-        params.push(`search=${search}`);
-      }
-
-      if (type) {
-        params.push(`type=${type}`);
-      }
-
-      if (params.length > 0) {
-        url += `?${params.join("&")}`;
-      }
-
-      const res = await API.get(url);
-      setProducts(res.data.products);
       setMessage("");
+
+      const selectedSearch =
+        customFilters.search !== undefined
+          ? customFilters.search
+          : search;
+
+      const selectedDepartment =
+        customFilters.department !== undefined
+          ? customFilters.department
+          : department;
+
+      const selectedCategory =
+        customFilters.category !== undefined
+          ? customFilters.category
+          : category;
+
+      const params = new URLSearchParams();
+
+      if (selectedSearch.trim()) {
+        params.append("search", selectedSearch.trim());
+      }
+
+      if (selectedDepartment) {
+        params.append(
+          "department",
+          selectedDepartment
+        );
+      }
+
+      if (selectedCategory) {
+        params.append("category", selectedCategory);
+      }
+
+      const query = params.toString();
+
+      const res = await API.get(
+        query ? `/products?${query}` : "/products"
+      );
+
+      setProducts(res.data.products || []);
     } catch (error) {
-      setMessage("Failed to fetch products");
+      setMessage(
+        error.response?.data?.message ||
+          "Failed to fetch products"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    fetchDepartments();
     getProducts();
   }, []);
+
+  const handleDepartmentChange = (e) => {
+    const selectedDepartment = e.target.value;
+
+    setDepartment(selectedDepartment);
+    setCategory("");
+
+    fetchCategories(selectedDepartment);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -52,55 +115,113 @@ function Products() {
 
   const clearFilters = () => {
     setSearch("");
-    setType("");
+    setDepartment("");
+    setCategory("");
+    setCategories([]);
 
-    setTimeout(() => {
-      getProducts();
-    }, 100);
+    getProducts({
+      search: "",
+      department: "",
+      category: ""
+    });
   };
 
   return (
     <div className="products-page">
       <div className="products-header">
-        <BackButton />
-        <p className="tagline">AutoCart Marketplace</p>
-        <h1>Explore Cars & Mini Collectibles</h1>
+        <p className="tagline">
+          AutoCart Marketplace
+        </p>
+
+        <h1>Explore AutoCart</h1>
+
         <p>
-          Browse real cars, sports cars, JDM legends, Hot Wheels, die-cast
-          models, and mini car toys.
+          Browse cars, merchandise, modification
+          products and other automobile essentials.
         </p>
       </div>
 
-      <form className="product-filters" onSubmit={handleSearch}>
+      <form
+        className="product-filters"
+        onSubmit={handleSearch}
+      >
         <input
           type="text"
-          placeholder="Search BMW, Supra, Ferrari..."
+          placeholder="Search by name, brand or model..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="">All Types</option>
-          <option value="Real Car">Real Car</option>
-          <option value="Mini Toy">Mini Toy</option>
+        <select
+          value={department}
+          onChange={handleDepartmentChange}
+        >
+          <option value="">
+            All Departments
+          </option>
+
+          {departments.map((item) => (
+            <option key={item._id} value={item._id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={category}
+          onChange={(e) =>
+            setCategory(e.target.value)
+          }
+          disabled={!department}
+        >
+          <option value="">
+            {department
+              ? "All Categories"
+              : "Select Department First"}
+          </option>
+
+          {categories.map((item) => (
+            <option key={item._id} value={item._id}>
+              {item.name}
+            </option>
+          ))}
         </select>
 
         <button type="submit">Search</button>
-        <button type="button" className="clear-btn" onClick={clearFilters}>
+
+        <button
+          type="button"
+          className="clear-btn"
+          onClick={clearFilters}
+        >
           Clear
         </button>
       </form>
 
-      {loading && <p className="status-text">Loading products...</p>}
-      {message && <p className="status-text error-text">{message}</p>}
+      {loading && (
+        <p className="status-text">
+          Loading products...
+        </p>
+      )}
+
+      {message && (
+        <p className="status-text error-text">
+          {message}
+        </p>
+      )}
 
       {!loading && products.length === 0 && (
-        <p className="status-text">No products found.</p>
+        <p className="status-text">
+          No products found.
+        </p>
       )}
 
       <div className="products-grid">
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard
+            key={product._id}
+            product={product}
+          />
         ))}
       </div>
     </div>

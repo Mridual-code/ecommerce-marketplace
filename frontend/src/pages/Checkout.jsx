@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
 
 
 function Checkout() {
@@ -38,7 +37,6 @@ function Checkout() {
 
   return (
     <div className="checkout-page">
-      <BackButton />
       <h1>Checkout</h1>
 
       <form className="checkout-form" onSubmit={placeOrder}>

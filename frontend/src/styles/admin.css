@@ -1,0 +1,179 @@
+.admin-page {
+  min-height: 100vh;
+  background: #0b0b0f;
+  color: #ffffff;
+  padding: 120px 7% 60px;
+}
+
+.admin-page h1 {
+  font-size: 40px;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+.form-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.admin-search {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.admin-search input {
+  flex: 1;
+  background: #14141d;
+  border: 1px solid #2b2b38;
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  outline: none;
+}
+
+.admin-search input:focus {
+  border-color: #ff1c1c;
+}
+
+.admin-search button {
+  background: #ff1c1c;
+  color: white;
+  border: none;
+  padding: 0 25px;
+  border-radius: 10px;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 35px;
+  padding: 24px;
+  background: #111118;
+  border: 1px solid #272732;
+  border-radius: 18px;
+}
+
+.product-form {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  width: 100%;
+  background: #14141d;
+  color: white;
+  border: 1px solid #2c2c38;
+  padding: 14px;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+  border-color: #ff1c1c;
+  box-shadow: 0 0 0 3px rgba(255, 28, 28, 0.1);
+}
+
+.admin-form select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-form textarea {
+  resize: vertical;
+  min-height: 120px;
+  grid-column: 1 / -1;
+}
+
+.admin-form button {
+  min-height: 48px;
+  background: #ff1c1c;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.25s ease;
+}
+
+.admin-form button:hover:not(:disabled) {
+  background: #d60000;
+}
+
+.admin-form button[type="button"] {
+  background: #30303c;
+}
+
+.admin-form button[type="button"]:hover:not(:disabled) {
+  background: #424252;
+}
+
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #14141d;
+}
+
+.admin-table thead {
+  background: #ff1c1c;
+}
+
+.admin-table th {
+  padding: 18px;
+  text-align: left;
+  color: white;
+  font-size: 15px;
+}
+
+.admin-table td {
+  padding: 18px;
+  border-bottom: 1px solid #272732;
+  vertical-align: middle;
+}
+
+.admin-table td:last-child {
+  white-space: nowrap;
+}
+
+.admin-table tr:hover {
+  background: #1b1b25;
+}
+
+.admin-table button {
+  margin-right: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.admin-table button:first-child {
+  background: #0066ff;
+  color: white;
+}
+
+.admin-table button:last-child {
+  background: #ff1c1c;
+  color: white;
+}
+
+.admin-table select {
+  background: #22222d;
+  color: white;
+  border: 1px solid #333344;
+  padding: 8px;
+  border-radius: 7px;
+}

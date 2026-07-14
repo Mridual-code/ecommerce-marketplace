@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import {
+  useNavigate,
+  Link
+} from "react-router-dom";
 import API from "../api/axios";
+import { toast } from "react-toastify";
 
 function Register() {
   const navigate = useNavigate();
@@ -11,20 +15,55 @@ function Register() {
     password: ""
   });
 
-  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
   };
 
   const registerUser = async (e) => {
     e.preventDefault();
 
+    if (
+      !form.name.trim() ||
+      !form.email.trim() ||
+      !form.password.trim()
+    ) {
+      toast.error(
+        "Please complete all required fields"
+      );
+      return;
+    }
+
     try {
-      await API.post("/auth/register", form);
+      setIsSubmitting(true);
+
+      const res = await API.post(
+        "/auth/register",
+        {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          password: form.password
+        }
+      );
+
+      toast.success(
+        res.data.message ||
+          "Registration successful"
+      );
+
       navigate("/login");
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed");
+      toast.error(
+        error.response?.data?.message ||
+          "Registration failed"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -32,9 +71,8 @@ function Register() {
     <div className="auth-page">
       <div className="auth-box">
         <h1>Register</h1>
-        <p>Create your AutoCart account</p>
 
-        {message && <div className="auth-message">{message}</div>}
+        <p>Create your AutoCart account</p>
 
         <form onSubmit={registerUser}>
           <input
@@ -43,6 +81,7 @@ function Register() {
             placeholder="Enter name"
             value={form.name}
             onChange={handleChange}
+            required
           />
 
           <input
@@ -51,6 +90,7 @@ function Register() {
             placeholder="Enter email"
             value={form.email}
             onChange={handleChange}
+            required
           />
 
           <input
@@ -59,13 +99,24 @@ function Register() {
             placeholder="Enter password"
             value={form.password}
             onChange={handleChange}
+            required
           />
 
-          <button type="submit">Register</button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? "Registering..."
+              : "Register"}
+          </button>
         </form>
 
         <p className="auth-link">
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account?{" "}
+          <Link to="/login">
+            Login
+          </Link>
         </p>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
 
 function Profile() {
   const [profile, setProfile] = useState({
@@ -65,7 +64,6 @@ function Profile() {
 
   return (
     <div className="profile-page">
-        <BackButton />
       <h1>My Profile</h1>
 
       {message && <p className="status-text">{message}</p>}

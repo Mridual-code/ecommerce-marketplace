@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
 
 
-function CustomerDashboard() {
+function CustomerDashboard({user}) {
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -37,8 +36,7 @@ function CustomerDashboard() {
 
   return (
     <div className="admin-page">
-      <BackButton />
-      <h1>Customer Dashboard</h1>
+      <h1>Welcome, {user?.name} 👋</h1>
 
       <div className="dashboard-grid">
         <div className="dashboard-card">

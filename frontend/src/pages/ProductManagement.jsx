@@ -1,130 +1,288 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
+import { toast } from "react-toastify";
+
+const initialForm = {
+  name: "",
+  brand: "",
+  model: "",
+  department: "",
+  category: "",
+  price: "",
+  stock: "",
+  image: "",
+  description: "",
+  color: "",
+  year: "",
+  fuelType: "",
+  transmission: "",
+  scale: "",
+  material: "",
+  ageGroup: ""
+};
 
 function ProductManagement() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [message, setMessage] = useState("");
+  const [departments, setDepartments] =
+    useState([]);
+  const [categories, setCategories] =
+    useState([]);
 
-  const [form, setForm] = useState({
-    name: "",
-    brand: "",
-    model: "",
-    type: "Real Car",
-    category: "",
-    price: "",
-    stock: "",
-    image: "",
-    description: "",
-    year: "",
-    fuelType: "",
-    transmission: "",
-    scale: ""
-  });
+  const [editingId, setEditingId] =
+    useState(null);
+
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  const [form, setForm] =
+    useState(initialForm);
 
   const fetchProducts = async () => {
     try {
       const res = await API.get("/products");
+
       setProducts(res.data.products || []);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to fetch products");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch products"
+      );
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchDepartments = async () => {
     try {
-      const res = await API.get("/categories");
-      setCategories(res.data.categories || []);
+      const res = await API.get(
+        "/departments"
+      );
+
+      setDepartments(
+        res.data.departments || []
+      );
     } catch (error) {
-      console.log(error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch departments"
+      );
+    }
+  };
+
+  const fetchCategoriesByDepartment = async (
+    departmentId
+  ) => {
+    if (!departmentId) {
+      setCategories([]);
+      return;
+    }
+
+    try {
+      const res = await API.get(
+        `/categories?department=${departmentId}`
+      );
+
+      setCategories(
+        res.data.categories || []
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch categories"
+      );
     }
   };
 
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
+    fetchDepartments();
   }, []);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+
+    if (name === "department") {
+      setForm((currentForm) => ({
+        ...currentForm,
+        department: value,
+        category: ""
+      }));
+
+      fetchCategoriesByDepartment(value);
+      return;
+    }
+
+    setForm((currentForm) => ({
+      ...currentForm,
+      [name]: value
+    }));
   };
 
   const resetForm = () => {
+    setForm(initialForm);
+    setCategories([]);
     setEditingId(null);
+  };
 
-    setForm({
-      name: "",
-      brand: "",
-      model: "",
-      type: "Real Car",
-      category: "",
-      price: "",
-      stock: "",
-      image: "",
-      description: "",
-      year: "",
-      fuelType: "",
-      transmission: "",
-      scale: ""
-    });
+  const createProductPayload = () => {
+    const payload = {
+      name: form.name.trim(),
+      brand: form.brand.trim(),
+      model: form.model.trim(),
+      category: form.category,
+      price: Number(form.price),
+      stock: Number(form.stock),
+      image: form.image.trim(),
+      description: form.description.trim(),
+      color: form.color.trim(),
+      fuelType: form.fuelType.trim(),
+      transmission:
+        form.transmission.trim(),
+      scale: form.scale.trim(),
+      material: form.material.trim(),
+      ageGroup: form.ageGroup.trim()
+    };
+
+    if (form.year) {
+      payload.year = Number(form.year);
+    }
+
+    return payload;
   };
 
   const submitProduct = async (e) => {
     e.preventDefault();
 
+    if (
+      !form.department ||
+      !form.category
+    ) {
+      toast.error(
+        "Please select a department and category"
+      );
+
+      return;
+    }
+
     try {
+      setIsSubmitting(true);
+
+      const payload =
+        createProductPayload();
+
       if (editingId) {
-        await API.put(`/products/${editingId}`, form);
+        await API.put(
+          `/products/${editingId}`,
+          payload
+        );
+
+        toast.success(
+          "Product updated successfully"
+        );
       } else {
-        await API.post("/products", form);
+        await API.post(
+          "/products",
+          payload
+        );
+
+        toast.success(
+          "Product added successfully"
+        );
       }
 
       resetForm();
       fetchProducts();
     } catch (error) {
-      setMessage(error.response?.data?.message || "Product action failed");
+      toast.error(
+        error.response?.data?.message ||
+          "Product operation failed"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const editProduct = (product) => {
+  const editProduct = async (product) => {
+    const departmentId =
+      product.category?.department?._id ||
+      product.category?.department ||
+      "";
+
+    await fetchCategoriesByDepartment(
+      departmentId
+    );
+
     setEditingId(product._id);
 
     setForm({
       name: product.name || "",
       brand: product.brand || "",
       model: product.model || "",
-      type: product.type || "Real Car",
-      category: product.category?._id || product.category || "",
-      price: product.price || "",
-      stock: product.stock || "",
+      department: departmentId,
+      category:
+        product.category?._id ||
+        product.category ||
+        "",
+      price: product.price ?? "",
+      stock: product.stock ?? "",
       image: product.image || "",
-      description: product.description || "",
+      description:
+        product.description || "",
+      color: product.color || "",
       year: product.year || "",
       fuelType: product.fuelType || "",
-      transmission: product.transmission || "",
-      scale: product.scale || ""
+      transmission:
+        product.transmission || "",
+      scale: product.scale || "",
+      material: product.material || "",
+      ageGroup: product.ageGroup || ""
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
     });
   };
 
   const deleteProduct = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmed) return;
+
     try {
       await API.delete(`/products/${id}`);
+
+      toast.success(
+        "Product deleted successfully"
+      );
+
+      if (editingId === id) {
+        resetForm();
+      }
+
       fetchProducts();
     } catch (error) {
-      setMessage(error.response?.data?.message || "Delete failed");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete product"
+      );
     }
   };
-    return (
+
+  return (
     <div className="admin-page">
-        <BackButton />
       <h1>Product Management</h1>
 
-      <form className="admin-form product-form" onSubmit={submitProduct}>
+      <h2 className="form-title">
+        {editingId
+          ? "Update Product"
+          : "Create New Product"}
+      </h2>
+
+      <form
+        className="admin-form product-form"
+        onSubmit={submitProduct}
+      >
         <input
           name="name"
           placeholder="Product Name"
@@ -149,12 +307,25 @@ function ProductManagement() {
         />
 
         <select
-          name="type"
-          value={form.type}
+          name="department"
+          value={form.department}
           onChange={handleChange}
+          required
         >
-          <option value="Real Car">Real Car</option>
-          <option value="Mini Toy">Mini Toy</option>
+          <option value="">
+            Select Department
+          </option>
+
+          {departments.map(
+            (department) => (
+              <option
+                key={department._id}
+                value={department._id}
+              >
+                {department.name}
+              </option>
+            )
+          )}
         </select>
 
         <select
@@ -162,20 +333,31 @@ function ProductManagement() {
           value={form.category}
           onChange={handleChange}
           required
+          disabled={!form.department}
         >
-          <option value="">Select Category</option>
+          <option value="">
+            {form.department
+              ? "Select Category"
+              : "Select Department First"}
+          </option>
 
-          {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.name}
-            </option>
-          ))}
+          {categories.map(
+            (category) => (
+              <option
+                key={category._id}
+                value={category._id}
+              >
+                {category.name}
+              </option>
+            )
+          )}
         </select>
 
         <input
           type="number"
           name="price"
           placeholder="Price"
+          min="0"
           value={form.price}
           onChange={handleChange}
           required
@@ -185,6 +367,7 @@ function ProductManagement() {
           type="number"
           name="stock"
           placeholder="Stock"
+          min="0"
           value={form.stock}
           onChange={handleChange}
           required
@@ -198,6 +381,14 @@ function ProductManagement() {
         />
 
         <input
+          name="color"
+          placeholder="Color"
+          value={form.color}
+          onChange={handleChange}
+        />
+
+        <input
+          type="number"
           name="year"
           placeholder="Year"
           value={form.year}
@@ -225,60 +416,123 @@ function ProductManagement() {
           onChange={handleChange}
         />
 
+        <input
+          name="material"
+          placeholder="Material"
+          value={form.material}
+          onChange={handleChange}
+        />
+
+        <input
+          name="ageGroup"
+          placeholder="Age Group"
+          value={form.ageGroup}
+          onChange={handleChange}
+        />
+
         <textarea
           name="description"
           placeholder="Description"
           value={form.description}
           onChange={handleChange}
+          required
         />
 
-        <button type="submit">
-          {editingId ? "Update Product" : "Add Product"}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? editingId
+              ? "Updating..."
+              : "Adding..."
+            : editingId
+              ? "Update Product"
+              : "Add Product"}
         </button>
 
         {editingId && (
-          <button type="button" onClick={resetForm}>
+          <button
+            type="button"
+            onClick={resetForm}
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
         )}
       </form>
-
-      {message && (
-        <p className="status-text error-text">{message}</p>
-      )}
 
       <table className="admin-table">
         <thead>
           <tr>
             <th>Name</th>
             <th>Brand</th>
-            <th>Type</th>
+            <th>Department</th>
+            <th>Category</th>
             <th>Price</th>
             <th>Stock</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          {products.map((product) => (
-            <tr key={product._id}>
-              <td>{product.name}</td>
-              <td>{product.brand}</td>
-              <td>{product.type}</td>
-              <td>₹{product.price}</td>
-              <td>{product.stock}</td>
+          {products.length > 0 ? (
+            products.map((product) => (
+              <tr key={product._id}>
+                <td>{product.name}</td>
 
-              <td>
-                <button onClick={() => editProduct(product)}>
-                  Edit
-                </button>
+                <td>{product.brand}</td>
 
-                <button onClick={() => deleteProduct(product._id)}>
-                  Delete
-                </button>
+                <td>
+                  {product.category
+                    ?.department?.name ||
+                    "Not assigned"}
+                </td>
+
+                <td>
+                  {product.category?.name ||
+                    "Not assigned"}
+                </td>
+
+                <td>
+                  ₹
+                  {Number(
+                    product.price || 0
+                  ).toLocaleString("en-IN")}
+                </td>
+
+                <td>{product.stock}</td>
+
+                <td>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editProduct(product)
+                    }
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      deleteProduct(
+                        product._id
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="7">
+                No products found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

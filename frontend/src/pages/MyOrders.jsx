@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
-import BackButton from "../components/BackButton";
 
 
 function MyOrders() {
@@ -22,7 +21,6 @@ function MyOrders() {
 
   return (
     <div className="orders-page">
-        <BackButton />
       <h1>My Orders</h1>
 
       {message && <p className="status-text error-text">{message}</p>}

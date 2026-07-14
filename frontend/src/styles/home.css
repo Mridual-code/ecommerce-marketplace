@@ -1,0 +1,140 @@
+.hero {
+  min-height: calc(100vh - 75px);
+  padding: 70px 7%;
+  display: flex;
+  align-items: center;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  transition: background 1s ease-in-out;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 760px;
+}
+
+.tagline {
+  color: #e50914;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.hero h1 {
+  font-size: 58px;
+  max-width: 750px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.hero-content > p {
+  max-width: 650px;
+  color: #d0d0d0;
+  line-height: 1.7;
+  font-size: 17px;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-weight: bold;
+  transition: 0.25s ease;
+}
+
+.primary-btn {
+  background: #e50914;
+  color: white;
+}
+
+.primary-btn:hover {
+  background: #c70812;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  border: 1px solid #ffffff;
+  color: white;
+  background: transparent;
+}
+
+.secondary-btn:hover {
+  background: white;
+  color: #111;
+}
+
+.feature-grid,
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.feature-card,
+.category-grid div {
+  background: #14141b;
+  border: 1px solid #292933;
+  border-radius: 18px;
+  padding: 30px;
+}
+
+.feature-card h3 {
+  color: #e50914;
+  margin-bottom: 15px;
+}
+
+.feature-card p {
+  color: #cfcfcf;
+  line-height: 1.6;
+}
+
+.category-grid div {
+  text-align: center;
+  font-weight: bold;
+}
+
+.dark-section {
+  background: #111118;
+}
+
+.about-section p {
+  max-width: 900px;
+  margin: auto;
+  color: #cfcfcf;
+  text-align: center;
+  line-height: 1.8;
+  font-size: 17px;
+}
+
+.footer {
+  background: #050508;
+  border-top: 1px solid #222;
+  padding: 35px 7%;
+  text-align: center;
+}
+
+.footer h3 {
+  color: #e50914;
+  margin-bottom: 10px;
+}
+
+.footer p {
+  color: #aaa;
+  margin: 8px 0;
+}
+
+.slide-count,
+.slider-dots,
+.slide-arrow,
+.left-arrow,
+.right-arrow {
+  display: none !important;
+}
