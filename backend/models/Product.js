@@ -4,22 +4,19 @@ const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
 
     brand: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
 
     model: {
-      type: String
-    },
-
-    type: {
       type: String,
-      enum: ["Real Car", "Mini Toy"],
-      required: true
+      trim: true
     },
 
     category: {
@@ -30,18 +27,21 @@ const productSchema = new mongoose.Schema(
 
     price: {
       type: Number,
-      required: true
+      required: true,
+      min: 0
     },
 
     stock: {
       type: Number,
       required: true,
-      default: 0
+      default: 0,
+      min: 0
     },
 
     description: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
 
     image: {

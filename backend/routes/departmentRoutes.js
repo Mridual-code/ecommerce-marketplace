@@ -1,41 +1,41 @@
 const express = require("express");
 
 const {
-  createCategory,
-  getCategories,
-  getCategoryById,
-  updateCategory,
-  deleteCategory
-} = require("../controllers/categoryController");
+  createDepartment,
+  getDepartments,
+  getDepartmentById,
+  updateDepartment,
+  deleteDepartment
+} = require("../controllers/departmentController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-router.get("/", getCategories);
+router.get("/", getDepartments);
 
-router.get("/:id", getCategoryById);
+router.get("/:id", getDepartmentById);
 
 router.post(
   "/",
   authMiddleware,
   roleMiddleware("Admin", "Manager"),
-  createCategory
+  createDepartment
 );
 
 router.put(
   "/:id",
   authMiddleware,
   roleMiddleware("Admin", "Manager"),
-  updateCategory
+  updateDepartment
 );
 
 router.delete(
   "/:id",
   authMiddleware,
   roleMiddleware("Admin", "Manager"),
-  deleteCategory
+  deleteDepartment
 );
 
 module.exports = router;
