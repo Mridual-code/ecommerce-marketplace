@@ -11,6 +11,13 @@ const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const serviceRoutes = require(
+  "./routes/serviceRoutes"
+);
+
+const serviceBookingRoutes = require(
+  "./routes/serviceBookingRoutes"
+);
 
 const app = express();
 
@@ -37,6 +44,12 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/services", serviceRoutes);
+
+app.use(
+  "/api/service-bookings",
+  serviceBookingRoutes
+);
 
 mongoose
   .connect(process.env.MONGO_URI)
