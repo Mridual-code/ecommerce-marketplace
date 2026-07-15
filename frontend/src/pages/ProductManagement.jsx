@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import {
+  useLocation,
+  useNavigate
+} from "react-router-dom";
 import API from "../api/axios";
 import { toast } from "react-toastify";
 
@@ -22,18 +26,18 @@ const initialForm = {
 };
 
 function ProductManagement() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [departments, setDepartments] =
     useState([]);
   const [categories, setCategories] =
     useState([]);
-
   const [editingId, setEditingId] =
     useState(null);
-
   const [isSubmitting, setIsSubmitting] =
     useState(false);
-
   const [form, setForm] =
     useState(initialForm);
 
@@ -41,20 +45,24 @@ function ProductManagement() {
     try {
       const res = await API.get("/products");
 
-      setProducts(res.data.products || []);
+      const productList =
+        res.data.products || [];
+
+      setProducts(productList);
+      return productList;
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to fetch products"
       );
+
+      return [];
     }
   };
 
   const fetchDepartments = async () => {
     try {
-      const res = await API.get(
-        "/departments"
-      );
+      const res = await API.get("/departments");
 
       setDepartments(
         res.data.departments || []
@@ -91,9 +99,79 @@ function ProductManagement() {
     }
   };
 
+  const editProduct = async (product) => {
+    const departmentId =
+      product.category?.department?._id ||
+      product.category?.department ||
+      "";
+
+    await fetchCategoriesByDepartment(
+      departmentId
+    );
+
+    setEditingId(product._id);
+
+    setForm({
+      name: product.name || "",
+      brand: product.brand || "",
+      model: product.model || "",
+      department: departmentId,
+      category:
+        product.category?._id ||
+        product.category ||
+        "",
+      price: product.price ?? "",
+      stock: product.stock ?? "",
+      image: product.image || "",
+      description:
+        product.description || "",
+      color: product.color || "",
+      year: product.year || "",
+      fuelType: product.fuelType || "",
+      transmission:
+        product.transmission || "",
+      scale: product.scale || "",
+      material: product.material || "",
+      ageGroup: product.ageGroup || ""
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
   useEffect(() => {
-    fetchProducts();
-    fetchDepartments();
+    const loadPage = async () => {
+      const productList =
+        await fetchProducts();
+
+      await fetchDepartments();
+
+      const selectedProductId =
+        location.state?.editProductId;
+
+      if (selectedProductId) {
+        const selectedProduct =
+          productList.find(
+            (product) =>
+              product._id === selectedProductId
+          );
+
+        if (selectedProduct) {
+          await editProduct(selectedProduct);
+        } else {
+          toast.error("Selected product not found");
+        }
+
+        navigate("/admin/products", {
+          replace: true,
+          state: null
+        });
+      }
+    };
+
+    loadPage();
   }, []);
 
   const handleChange = (e) => {
@@ -151,14 +229,10 @@ function ProductManagement() {
   const submitProduct = async (e) => {
     e.preventDefault();
 
-    if (
-      !form.department ||
-      !form.category
-    ) {
+    if (!form.department || !form.category) {
       toast.error(
         "Please select a department and category"
       );
-
       return;
     }
 
@@ -178,10 +252,7 @@ function ProductManagement() {
           "Product updated successfully"
         );
       } else {
-        await API.post(
-          "/products",
-          payload
-        );
+        await API.post("/products", payload);
 
         toast.success(
           "Product added successfully"
@@ -198,48 +269,6 @@ function ProductManagement() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const editProduct = async (product) => {
-    const departmentId =
-      product.category?.department?._id ||
-      product.category?.department ||
-      "";
-
-    await fetchCategoriesByDepartment(
-      departmentId
-    );
-
-    setEditingId(product._id);
-
-    setForm({
-      name: product.name || "",
-      brand: product.brand || "",
-      model: product.model || "",
-      department: departmentId,
-      category:
-        product.category?._id ||
-        product.category ||
-        "",
-      price: product.price ?? "",
-      stock: product.stock ?? "",
-      image: product.image || "",
-      description:
-        product.description || "",
-      color: product.color || "",
-      year: product.year || "",
-      fuelType: product.fuelType || "",
-      transmission:
-        product.transmission || "",
-      scale: product.scale || "",
-      material: product.material || "",
-      ageGroup: product.ageGroup || ""
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
   };
 
   const deleteProduct = async (id) => {
@@ -316,16 +345,14 @@ function ProductManagement() {
             Select Department
           </option>
 
-          {departments.map(
-            (department) => (
-              <option
-                key={department._id}
-                value={department._id}
-              >
-                {department.name}
-              </option>
-            )
-          )}
+          {departments.map((department) => (
+            <option
+              key={department._id}
+              value={department._id}
+            >
+              {department.name}
+            </option>
+          ))}
         </select>
 
         <select
@@ -341,16 +368,14 @@ function ProductManagement() {
               : "Select Department First"}
           </option>
 
-          {categories.map(
-            (category) => (
-              <option
-                key={category._id}
-                value={category._id}
-              >
-                {category.name}
-              </option>
-            )
-          )}
+          {categories.map((category) => (
+            <option
+              key={category._id}
+              value={category._id}
+            >
+              {category.name}
+            </option>
+          ))}
         </select>
 
         <input
@@ -480,7 +505,6 @@ function ProductManagement() {
             products.map((product) => (
               <tr key={product._id}>
                 <td>{product.name}</td>
-
                 <td>{product.brand}</td>
 
                 <td>
@@ -516,9 +540,7 @@ function ProductManagement() {
                   <button
                     type="button"
                     onClick={() =>
-                      deleteProduct(
-                        product._id
-                      )
+                      deleteProduct(product._id)
                     }
                   >
                     Delete

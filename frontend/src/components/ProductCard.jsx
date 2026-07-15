@@ -1,53 +1,73 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./ProductCard.css";
 
 function ProductCard({ product }) {
-  const navigate = useNavigate();
+  const departmentName =
+    product.category?.department?.name || "";
 
   return (
-    <div className="product-card">
-      <div className="product-img">
+    <article className="catalog-card">
+      <div className="catalog-card__image">
         {product.image ? (
-          <img src={product.image} alt={product.name} />
+          <img
+            src={product.image}
+            alt={product.name}
+          />
         ) : (
           <span>No Image</span>
         )}
       </div>
 
-      <div className="product-info">
-        <div className="product-top">
-          <p className="product-type">{product.type}</p>
-          <p className={product.stock > 0 ? "stock-badge" : "stock-badge out"}>
-            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-          </p>
+      <div className="catalog-card__content">
+        <div className="catalog-card__badges">
+          {departmentName && (
+            <span className="catalog-card__department">
+              {departmentName}
+            </span>
+          )}
+
+          <span
+            className={
+              product.stock > 0
+                ? "catalog-card__stock available"
+                : "catalog-card__stock unavailable"
+            }
+          >
+            {product.stock > 0
+              ? `${product.stock} in stock`
+              : "Out of stock"}
+          </span>
         </div>
 
-        <h3>{product.name}</h3>
+        <h2>CSS TEST — {product.name}</h2>
 
-        <p className="product-brand">
+        <p className="catalog-card__brand">
           {product.brand}
-          {product.model && ` • ${product.model}`}
+          {product.model &&
+            ` • ${product.model}`}
         </p>
 
         {product.category?.name && (
-          <p className="product-category">{product.category.name}</p>
+          <p className="catalog-card__category">
+            {product.category.name}
+          </p>
         )}
 
-        <h4>₹{Number(product.price).toLocaleString("en-IN")}</h4>
+        <h3 className="catalog-card__price">
+          ₹
+          {Number(
+            product.price || 0
+          ).toLocaleString("en-IN")}
+        </h3>
 
-        <div className="product-meta">
-          {product.year && <span>{product.year}</span>}
-          {product.fuelType && <span>{product.fuelType}</span>}
-          {product.transmission && <span>{product.transmission}</span>}
-          {product.scale && <span>{product.scale}</span>}
-        </div>
-
-        <button
-          onClick={() => navigate(`/products/${product._id}`)}
+        <Link
+          to={`/products/${product._id}`}
+          className="catalog-card__button"
         >
           View Details
-        </button>
+        </Link>
       </div>
-    </div>
+    </article>
   );
 }
 

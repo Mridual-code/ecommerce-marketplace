@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
-import {
-  useNavigate,
-  useParams
-} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function ProductDetails({ user }) {
@@ -36,42 +33,44 @@ function ProductDetails({ user }) {
   }, [id]);
 
   const addToCart = async () => {
-  if (!user) {
-    toast.info(
-      "Please log in as a customer first"
-    );
+    if (!user) {
+      toast.info("Please log in as a customer first");
+      navigate("/login");
+      return;
+    }
 
-    navigate("/login");
-    return;
-  }
+    if (user.role !== "Customer") {
+      return;
+    }
 
-  if (user.role !== "Customer") {
-    toast.error(
-      "Only customers can add products to the cart"
-    );
-    return;
-  }
+    if (product.stock <= 0) {
+      toast.error("This product is out of stock");
+      return;
+    }
 
-  if (product.stock <= 0) {
-    toast.error("This product is out of stock");
-    return;
-  }
+    try {
+      await API.post("/cart", {
+        productId: id,
+        quantity: 1
+      });
 
-  try {
-    await API.post("/cart", {
-      productId: id,
-      quantity: 1
+      toast.success("Product added to cart");
+      navigate("/cart");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add product to cart"
+      );
+    }
+  };
+
+  const editProduct = () => {
+    navigate("/admin/products", {
+      state: {
+        editProductId: product._id
+      }
     });
-
-    toast.success("Product added to cart");
-    navigate("/cart");
-  } catch (error) {
-    toast.error(
-      error.response?.data?.message ||
-        "Failed to add product to cart"
-    );
-  }
-};
+  };
 
   if (!product) {
     return (
@@ -149,9 +148,7 @@ function ProductDetails({ user }) {
             {product.fuelType && (
               <div>
                 <span>Fuel</span>
-                <strong>
-                  {product.fuelType}
-                </strong>
+                <strong>{product.fuelType}</strong>
               </div>
             )}
 
@@ -174,18 +171,14 @@ function ProductDetails({ user }) {
             {product.material && (
               <div>
                 <span>Material</span>
-                <strong>
-                  {product.material}
-                </strong>
+                <strong>{product.material}</strong>
               </div>
             )}
 
             {product.ageGroup && (
               <div>
                 <span>Age Group</span>
-                <strong>
-                  {product.ageGroup}
-                </strong>
+                <strong>{product.ageGroup}</strong>
               </div>
             )}
 
@@ -200,28 +193,34 @@ function ProductDetails({ user }) {
             </div>
           </div>
 
-          <button
-            className="details-btn"
-            onClick={addToCart}
-            disabled={product.stock <= 0}
-          >
-            {product.stock > 0
-              ? "Add to Cart"
-              : "Out of Stock"}
-          </button>
-
-          {!user && (
-            <p className="admin-note">
-              Login as a customer to add this
-              product to your cart.
-            </p>
+          {user?.role === "Customer" && (
+            <button
+              className="details-btn"
+              onClick={addToCart}
+              disabled={product.stock <= 0}
+            >
+              {product.stock > 0
+                ? "Add to Cart"
+                : "Out of Stock"}
+            </button>
           )}
 
-          {user && user.role !== "Customer" && (
-            <p className="admin-note">
-              Only customers can add products to
-              the cart.
-            </p>
+          {user?.role === "Admin" && (
+            <button
+              className="details-btn"
+              onClick={editProduct}
+            >
+              Edit Product Details
+            </button>
+          )}
+
+          {!user && (
+            <button
+              className="details-btn"
+              onClick={() => navigate("/login")}
+            >
+              Login to Add to Cart
+            </button>
           )}
 
           {message && (

@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import {
+  useSearchParams
+} from "react-router-dom";
 import API from "../api/axios";
 import ProductCard from "../components/ProductCard";
 
@@ -7,56 +10,40 @@ function DepartmentProducts({
   title,
   description
 }) {
-  const [department, setDepartment] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const categoryFromUrl =
+    searchParams.get("category") || "";
 
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [department, setDepartment] =
+    useState(null);
+  const [categories, setCategories] =
+    useState([]);
+  const [products, setProducts] =
+    useState([]);
 
-  const fetchDepartment = async () => {
-    try {
-      const res = await API.get("/departments");
+  const [search, setSearch] =
+    useState("");
+  const [category, setCategory] =
+    useState(categoryFromUrl);
 
-      const foundDepartment =
-        (res.data.departments || []).find(
-          (item) =>
-            item.name.toLowerCase() ===
-            departmentName.toLowerCase()
-        );
+  const [loading, setLoading] =
+    useState(true);
+  const [message, setMessage] =
+    useState("");
 
-      if (!foundDepartment) {
-        setMessage(
-          `${departmentName} department has not been created yet.`
-        );
-        setLoading(false);
-        return;
-      }
-
-      setDepartment(foundDepartment);
-
-      await fetchCategories(foundDepartment._id);
-      await fetchProducts(foundDepartment._id);
-    } catch (error) {
-      setMessage(
-        error.response?.data?.message ||
-          "Failed to load department"
-      );
-
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async (departmentId) => {
+  const fetchCategories = async (
+    departmentId
+  ) => {
     try {
       const res = await API.get(
         `/categories?department=${departmentId}`
       );
 
-      setCategories(res.data.categories || []);
+      setCategories(
+        res.data.categories || []
+      );
     } catch (error) {
       console.log(error);
     }
@@ -73,21 +60,32 @@ function DepartmentProducts({
 
       const params = new URLSearchParams();
 
-      params.append("department", departmentId);
+      params.append(
+        "department",
+        departmentId
+      );
 
       if (selectedCategory) {
-        params.append("category", selectedCategory);
+        params.append(
+          "category",
+          selectedCategory
+        );
       }
 
       if (searchValue.trim()) {
-        params.append("search", searchValue.trim());
+        params.append(
+          "search",
+          searchValue.trim()
+        );
       }
 
       const res = await API.get(
         `/products?${params.toString()}`
       );
 
-      setProducts(res.data.products || []);
+      setProducts(
+        res.data.products || []
+      );
     } catch (error) {
       setMessage(
         error.response?.data?.message ||
@@ -98,9 +96,53 @@ function DepartmentProducts({
     }
   };
 
+  const fetchDepartment = async () => {
+    try {
+      const res = await API.get(
+        "/departments"
+      );
+
+      const foundDepartment = (
+        res.data.departments || []
+      ).find(
+        (item) =>
+          item.name.toLowerCase() ===
+          departmentName.toLowerCase()
+      );
+
+      if (!foundDepartment) {
+        setMessage(
+          `${departmentName} department has not been created yet.`
+        );
+        setLoading(false);
+        return;
+      }
+
+      setDepartment(foundDepartment);
+
+      await fetchCategories(
+        foundDepartment._id
+      );
+
+      await fetchProducts(
+        foundDepartment._id,
+        categoryFromUrl,
+        ""
+      );
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message ||
+          "Failed to load department"
+      );
+
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    setCategory(categoryFromUrl);
     fetchDepartment();
-  }, [departmentName]);
+  }, [departmentName, categoryFromUrl]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -115,25 +157,31 @@ function DepartmentProducts({
   };
 
   const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
+    const selectedCategory =
+      e.target.value;
 
     setCategory(selectedCategory);
 
-    if (department) {
-      fetchProducts(
-        department._id,
-        selectedCategory,
-        search
-      );
+    if (selectedCategory) {
+      setSearchParams({
+        category: selectedCategory
+      });
+    } else {
+      setSearchParams({});
     }
   };
 
   const clearFilters = () => {
     setSearch("");
     setCategory("");
+    setSearchParams({});
 
     if (department) {
-      fetchProducts(department._id, "", "");
+      fetchProducts(
+        department._id,
+        "",
+        ""
+      );
     }
   };
 
@@ -145,7 +193,6 @@ function DepartmentProducts({
         </p>
 
         <h1>{title}</h1>
-
         <p>{description}</p>
       </div>
 
@@ -181,7 +228,9 @@ function DepartmentProducts({
             ))}
           </select>
 
-          <button type="submit">Search</button>
+          <button type="submit">
+            Search
+          </button>
 
           <button
             type="button"

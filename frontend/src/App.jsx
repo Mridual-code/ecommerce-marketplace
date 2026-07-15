@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
+import "react-toastify/dist/ReactToastify.css";
 import API, { injectLoader } from "./api/axios";
+
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -12,6 +13,11 @@ import { useLoader } from "./context/LoaderContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ServiceDetails from "./pages/ServiceDetails";
+import BookService from "./pages/BookService";
+import MyServiceBookings from "./pages/MyServiceBookings";
+import ServiceManagement from "./pages/ServiceManagement";
+import ServiceBookingManagement from "./pages/ServiceBookingManagement";
 
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
@@ -121,27 +127,35 @@ function App() {
           element={<Register />}
         />
 
-        <Route
-          path="/admin"
-          element={
-            <AdminDashboard user={user} />
-          }
-        />
+       <Route
+  path="/admin"
+  element={
+    <AdminDashboard
+      user={user}
+      setUser={setUser}
+    />
+  }
+/>
 
-        <Route
-          path="/manager"
-          element={
-            <ManagerDashboard user={user} />
-          }
-        />
+<Route
+  path="/manager"
+  element={
+    <ManagerDashboard
+      user={user}
+      setUser={setUser}
+    />
+  }
+/>
 
-        <Route
-          path="/customer"
-          element={
-            <CustomerDashboard user={user} />
-          }
-        />
-
+<Route
+  path="/customer"
+  element={
+    <CustomerDashboard
+      user={user}
+      setUser={setUser}
+    />
+  }
+/>
         <Route
           path="/cart"
           element={<Cart />}
@@ -186,6 +200,30 @@ function App() {
           path="/admin/orders"
           element={<OrderManagement />}
         />
+        <Route
+  path="/services/:id"
+  element={<ServiceDetails user={user} />}
+/>
+
+<Route
+  path="/services/:id/book"
+  element={<BookService />}
+/>
+
+<Route
+  path="/service-bookings"
+  element={<MyServiceBookings />}
+/>
+
+<Route
+  path="/admin/services"
+  element={<ServiceManagement />}
+/>
+
+<Route
+  path="/admin/service-bookings"
+  element={<ServiceBookingManagement />}
+/>
       </Routes>
 
       <Footer />
