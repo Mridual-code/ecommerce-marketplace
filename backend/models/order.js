@@ -1,5 +1,23 @@
 const mongoose = require("mongoose");
 
+const trackingHistorySchema =
+  new mongoose.Schema(
+    {
+      status: {
+        type: String,
+        required: true
+      },
+
+      timestamp: {
+        type: Date,
+        default: Date.now
+      }
+    },
+    {
+      _id: false
+    }
+  );
+
 const orderSchema = new mongoose.Schema(
   {
     user: {
@@ -15,20 +33,25 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true
         },
+
         quantity: {
           type: Number,
-          required: true
+          required: true,
+          min: 1
         },
+
         price: {
           type: Number,
-          required: true
+          required: true,
+          min: 0
         }
       }
     ],
 
     totalAmount: {
       type: Number,
-      required: true
+      required: true,
+      min: 0
     },
 
     shippingAddress: {
@@ -42,11 +65,38 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
+      enum: [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered",
+        "Cancelled"
+      ],
       default: "Pending"
+    },
+
+    estimatedDeliveryDate: {
+      type: Date,
+      required: true
+    },
+
+    deliveredAt: {
+      type: Date,
+      default: null
+    },
+
+    trackingHistory: {
+      type: [trackingHistorySchema],
+      default: []
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true
+  }
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model(
+  "Order",
+  orderSchema
+);
