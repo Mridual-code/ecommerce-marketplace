@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API, { injectLoader } from "./api/axios";
+import Wishlist from "./pages/Wishlist";
 
 
 import Navbar from "./components/Navbar";
@@ -209,7 +210,10 @@ function App() {
   path="/services/:id/book"
   element={<BookService />}
 />
-
+<Route
+  path="/wishlist"
+  element={<Wishlist />}
+/>
 <Route
   path="/service-bookings"
   element={<MyServiceBookings />}

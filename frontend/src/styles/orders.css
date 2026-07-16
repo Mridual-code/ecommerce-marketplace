@@ -70,3 +70,62 @@
   padding-top: 18px;
   font-size: 20px;
 }
+.order-timeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.timeline-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #777;
+  text-align: center;
+  font-size: 13px;
+}
+
+.timeline-step::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 55%;
+  width: 90%;
+  height: 2px;
+  background: #333;
+  z-index: 0;
+}
+
+.timeline-step:last-child::after {
+  display: none;
+}
+
+.timeline-step.completed {
+  color: #20d98b;
+}
+
+.timeline-step.completed::after {
+  background: #20d98b;
+}
+
+.timeline-dot {
+  position: relative;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #17171d;
+  display: grid;
+  place-items: center;
+}
+
+.tracking-cancelled {
+  margin: 20px 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 20, 50, 0.12);
+  color: #ff4058;
+}

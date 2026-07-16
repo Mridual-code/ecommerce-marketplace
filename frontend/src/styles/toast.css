@@ -1,0 +1,30 @@
+.Toastify__toast {
+  background: #15151d;
+  color: #ffffff;
+  border: 1px solid #2c2c38;
+  border-radius: 12px;
+}
+
+.Toastify__toast--success {
+  border-color: #28a745;
+}
+
+.Toastify__toast--error {
+  border-color: #ff1c1c;
+}
+
+.Toastify__toast--info {
+  border-color: #0066ff;
+}
+
+.Toastify__progress-bar--success {
+  background: #28a745;
+}
+
+.Toastify__progress-bar--error {
+  background: #ff1c1c;
+}
+
+.Toastify__progress-bar--info {
+  background: #0066ff;
+}

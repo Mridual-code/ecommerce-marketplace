@@ -1,22 +1,19 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "./App";
+import { LoaderProvider } from "./context/LoaderContext";
 import "./index.css";
 
-import { LoaderProvider } from "./context/LoaderContext";
-
-import "react-toastify/dist/ReactToastify.css";
-
-ReactDOM.createRoot(
+createRoot(
   document.getElementById("root")
 ).render(
-  <React.StrictMode>
+  <StrictMode>
     <BrowserRouter>
       <LoaderProvider>
         <App />
       </LoaderProvider>
     </BrowserRouter>
-  </React.StrictMode>
+  </StrictMode>
 );

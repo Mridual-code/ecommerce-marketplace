@@ -4,6 +4,7 @@ import {
   useNavigate
 } from "react-router-dom";
 import API from "../api/axios";
+import ServiceCalendar from "../components/ServiceCalendar";
 
 function CustomerDashboard({
   user,
@@ -150,6 +151,7 @@ function CustomerDashboard({
           My Profile
         </Link>
       </div>
+      <ServiceCalendar customer />
     </div>
   );
 }

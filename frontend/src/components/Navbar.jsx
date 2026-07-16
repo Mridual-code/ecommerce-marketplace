@@ -7,6 +7,11 @@ import {
   Link,
   useLocation
 } from "react-router-dom";
+import {
+  FaHeart,
+  FaShoppingCart,
+  FaUser
+} from "react-icons/fa";
 import API from "../api/axios";
 
 function Navbar({ user }) {
@@ -17,6 +22,10 @@ function Navbar({ user }) {
     useState([]);
   const [carsOpen, setCarsOpen] =
     useState(false);
+  const [wishlistCount, setWishlistCount] =
+    useState(0);
+  const [cartCount, setCartCount] =
+    useState(0);
 
   const dashboardPath =
     user?.role === "Admin"
@@ -28,8 +37,9 @@ function Navbar({ user }) {
   const fetchCarCategories = async () => {
     try {
       const departmentResponse =
-        await API.get("/departments");
-
+       await API.get("/departments", {
+  skipLoader: true
+});
       const carsDepartment = (
         departmentResponse.data.departments || []
       ).find(
@@ -38,21 +48,56 @@ function Navbar({ user }) {
           "cars"
       );
 
-      if (!carsDepartment) {
-        setCarCategories([]);
-        return;
-      }
+      if (!carsDepartment) return;
 
       const categoryResponse = await API.get(
-        `/categories?department=${carsDepartment._id}`
-      );
+  `/categories?department=${carsDepartment._id}`,
+  {
+    skipLoader: true
+  }
+);
 
       setCarCategories(
         categoryResponse.data.categories || []
       );
     } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCustomerCounts = async () => {
+    if (user?.role !== "Customer") {
+      setWishlistCount(0);
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const [wishlistResponse, cartResponse] =
+  await Promise.all([
+    API.get("/wishlist/count", {
+      skipLoader: true
+    }),
+    API.get("/cart", {
+      skipLoader: true
+    })
+  ]);
+
+      const items =
+        cartResponse.data.cart?.items ||
+        cartResponse.data.items ||
+        [];
+
+      setCartCount(
+        items.reduce(
+          (total, item) =>
+            total + Number(item.quantity || 0),
+          0
+        )
+      );
+    } catch (error) {
       console.log(
-        "Failed to load car categories:",
+        "Navbar count error:",
         error
       );
     }
@@ -63,6 +108,32 @@ function Navbar({ user }) {
   }, []);
 
   useEffect(() => {
+    fetchCustomerCounts();
+
+    window.addEventListener(
+      "wishlist-updated",
+      fetchCustomerCounts
+    );
+
+    window.addEventListener(
+      "cart-updated",
+      fetchCustomerCounts
+    );
+
+    return () => {
+      window.removeEventListener(
+        "wishlist-updated",
+        fetchCustomerCounts
+      );
+
+      window.removeEventListener(
+        "cart-updated",
+        fetchCustomerCounts
+      );
+    };
+  }, [user]);
+
+  useEffect(() => {
     setCarsOpen(false);
   }, [location.pathname, location.search]);
 
@@ -70,9 +141,7 @@ function Navbar({ user }) {
     const closeDropdown = (event) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(
-          event.target
-        )
+        !dropdownRef.current.contains(event.target)
       ) {
         setCarsOpen(false);
       }
@@ -83,12 +152,11 @@ function Navbar({ user }) {
       closeDropdown
     );
 
-    return () => {
+    return () =>
       document.removeEventListener(
         "mousedown",
         closeDropdown
       );
-    };
   }, []);
 
   return (
@@ -108,36 +176,23 @@ function Navbar({ user }) {
               carsOpen ? "active" : ""
             }`}
             onClick={() =>
-              setCarsOpen((current) => !current)
+              setCarsOpen((value) => !value)
             }
-            aria-expanded={carsOpen}
           >
             Cars
-
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="m7 10 5 5 5-5H7Z" />
-            </svg>
+            <span>⌄</span>
           </button>
 
           {carsOpen && (
             <div className="cars-dropdown-menu">
-              {carCategories.length > 0 ? (
-                carCategories.map((category) => (
-                  <Link
-                    key={category._id}
-                    to={`/cars?category=${category._id}`}
-                  >
-                    {category.name}
-                  </Link>
-                ))
-              ) : (
-                <span className="dropdown-empty">
-                  No car categories
-                </span>
-              )}
+              {carCategories.map((category) => (
+                <Link
+                  key={category._id}
+                  to={`/cars?category=${category._id}`}
+                >
+                  {category.name}
+                </Link>
+              ))}
 
               <div className="dropdown-divider" />
 
@@ -159,19 +214,39 @@ function Navbar({ user }) {
           Modifications
         </Link>
 
+        {user?.role === "Customer" && (
+          <>
+            <Link
+              to="/wishlist"
+              className="nav-icon-link"
+              title="Wishlist"
+            >
+              <FaHeart />
+              {wishlistCount > 0 && (
+                <span>{wishlistCount}</span>
+              )}
+            </Link>
+
+            <Link
+              to="/cart"
+              className="nav-icon-link"
+              title="Cart"
+            >
+              <FaShoppingCart />
+              {cartCount > 0 && (
+                <span>{cartCount}</span>
+              )}
+            </Link>
+          </>
+        )}
+
         {user && (
           <Link
             to={dashboardPath}
             className="dashboard-icon-link"
             title={`${user.role} Dashboard`}
-            aria-label={`${user.role} Dashboard`}
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14Z" />
-            </svg>
+            <FaUser />
           </Link>
         )}
 

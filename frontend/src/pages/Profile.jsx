@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
+import { toast } from "react-toastify";
 
 function Profile() {
   const [profile, setProfile] = useState({
@@ -30,37 +31,53 @@ function Profile() {
   }, []);
 
   const updateProfile = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await API.put("/users/profile", {
-        name: profile.name,
-        email: profile.email
-      });
+  try {
+    const res = await API.put(
+      "/auth/profile",
+      profileForm
+    );
 
-      setProfile(res.data.user);
-      setMessage("Profile updated successfully");
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to update profile");
-    }
-  };
+    toast.success(
+      res.data.message ||
+        "Profile updated successfully"
+    );
+
+    fetchProfile();
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to update profile"
+    );
+  }
+};
 
   const changePassword = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await API.put("/users/change-password", passwords);
+  try {
+    const res = await API.put(
+      "/auth/change-password",
+      passwordForm
+    );
 
-      setPasswords({
-        oldPassword: "",
-        newPassword: ""
-      });
+    toast.success(
+      res.data.message ||
+        "Password changed successfully"
+    );
 
-      setMessage("Password changed successfully");
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to change password");
-    }
-  };
+    setPasswordForm({
+      currentPassword: "",
+      newPassword: ""
+    });
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to change password"
+    );
+  }
+};
 
   return (
     <div className="profile-page">

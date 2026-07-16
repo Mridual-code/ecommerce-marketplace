@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import WishlistButton from "../components/WishlistButton";
 
 function ProductDetails({ user }) {
   const { id } = useParams();
@@ -53,6 +54,9 @@ function ProductDetails({ user }) {
         productId: id,
         quantity: 1
       });
+      window.dispatchEvent(
+  new Event("cart-updated")
+);
 
       toast.success("Product added to cart");
       navigate("/cart");
@@ -124,6 +128,16 @@ function ProductDetails({ user }) {
               product.price || 0
             ).toLocaleString("en-IN")}
           </h2>
+          <div className="product-delivery-info">
+  <strong>Delivery in 2–3 working days</strong>
+  <span>
+    Order tracking is available after checkout.
+  </span>
+</div>
+
+{user?.role === "Customer" && (
+  <WishlistButton productId={product._id} />
+)}
 
           <p className="details-description">
             {product.description ||

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import WishlistButton from "./WishlistButton";
 import "./ProductCard.css";
 
 function ProductCard({ product }) {
@@ -8,6 +9,10 @@ function ProductCard({ product }) {
   return (
     <article className="catalog-card">
       <div className="catalog-card__image">
+        <WishlistButton
+          productId={product._id}
+        />
+
         {product.image ? (
           <img
             src={product.image}
@@ -39,7 +44,7 @@ function ProductCard({ product }) {
           </span>
         </div>
 
-        <h2>CSS TEST — {product.name}</h2>
+        <h2>{product.name}</h2>
 
         <p className="catalog-card__brand">
           {product.brand}

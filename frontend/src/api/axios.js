@@ -5,43 +5,79 @@ const API = axios.create({
 });
 
 let setGlobalLoading = null;
+let activeLoaderRequests = 0;
 
 export const injectLoader = (loaderSetter) => {
   setGlobalLoading = loaderSetter;
 };
 
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("autocart_token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+const startLoader = (config) => {
+  if (config.skipLoader) {
+    return;
   }
+
+  activeLoaderRequests += 1;
 
   if (setGlobalLoading) {
     setGlobalLoading(true);
   }
+};
 
-  return config;
-});
+const stopLoader = (config = {}) => {
+  if (config.skipLoader) {
+    return;
+  }
+
+  /*
+    Small delay prevents the loader from flashing
+    too quickly on fast requests.
+  */
+  setTimeout(() => {
+    activeLoaderRequests = Math.max(
+      0,
+      activeLoaderRequests - 1
+    );
+
+    if (
+      activeLoaderRequests === 0 &&
+      setGlobalLoading
+    ) {
+      setGlobalLoading(false);
+    }
+  }, 300);
+};
+
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(
+      "autocart_token"
+    );
+
+    if (token) {
+      config.headers.Authorization =
+        `Bearer ${token}`;
+    }
+
+    startLoader(config);
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 API.interceptors.response.use(
   (response) => {
-    setTimeout(() => {
-      if (setGlobalLoading) {
-        setGlobalLoading(false);
-      }
-    }, 800);
+    stopLoader(response.config);
 
     return response;
   },
   (error) => {
-    setTimeout(() => {
-      if (setGlobalLoading) {
-        setGlobalLoading(false);
-      }
-    }, 800);
+    stopLoader(error.config);
 
     return Promise.reject(error);
   }
 );
+
 export default API;

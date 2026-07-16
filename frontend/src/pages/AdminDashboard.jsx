@@ -4,6 +4,7 @@ import {
   useNavigate
 } from "react-router-dom";
 import API from "../api/axios";
+import ServiceCalendar from "../components/ServiceCalendar";
 
 function AdminDashboard({ user, setUser }) {
   const navigate = useNavigate();
@@ -138,6 +139,7 @@ function AdminDashboard({ user, setUser }) {
   Manage Service Bookings
 </Link>
       </div>
+      <ServiceCalendar />
     </div>
   );
 }

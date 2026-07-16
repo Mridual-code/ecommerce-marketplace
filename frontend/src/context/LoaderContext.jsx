@@ -1,15 +1,37 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useState
+} from "react";
 
-const LoaderContext = createContext();
+const LoaderContext = createContext(null);
 
-export const LoaderProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
+export const LoaderProvider = ({
+  children
+}) => {
+  const [loading, setLoading] =
+    useState(false);
 
   return (
-    <LoaderContext.Provider value={{ loading, setLoading }}>
+    <LoaderContext.Provider
+      value={{
+        loading,
+        setLoading
+      }}
+    >
       {children}
     </LoaderContext.Provider>
   );
 };
 
-export const useLoader = () => useContext(LoaderContext);
+export const useLoader = () => {
+  const context = useContext(LoaderContext);
+
+  if (!context) {
+    throw new Error(
+      "useLoader must be used inside LoaderProvider"
+    );
+  }
+
+  return context;
+};
